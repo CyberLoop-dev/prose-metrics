@@ -6,7 +6,7 @@ import re
 import sys
 from collections import Counter
 
-WORD_RE = re.compile(r"[\\w]+(?:['’][\\w]+)?", re.UNICODE)
+WORD_RE = re.compile(r"[\w]+(?:['’][\w]+)?", re.UNICODE)
 STOP_WORDS = {"the","and","for","that","with","this","from","you","your","are","was","were","have","has","had","but","not","they","their","its","into","about","there","then","than","when","what","which","will","would","could","should","can","all","one","two","out","our","who","how","why","his","her","she","him","them","been","being","also","just"}
 
 def syllables(word):
@@ -26,10 +26,10 @@ def syllables(word):
 
 def analyze(text):
     words = WORD_RE.findall(text)
-    sentences = [s for s in re.split(r"(?<=[.!?])\\s+", text.strip()) if s.strip()]
+    sentences = [s for s in re.split(r"(?<=[.!?])\s+", text.strip()) if s.strip()]
     if words and not sentences:
         sentences = [text.strip()]
-    paragraphs = [p for p in re.split(r"\\n\\s*\\n", text.strip()) if p.strip()]
+    paragraphs = [p for p in re.split(r"\n\s*\n", text.strip()) if p.strip()]
     word_count = len(words)
     sentence_count = len(sentences)
     syllable_count = sum(syllables(w) for w in words)
@@ -41,7 +41,7 @@ def analyze(text):
     counts = Counter(w.lower() for w in words if len(w) > 3 and w.lower() not in STOP_WORDS)
     return {
         "characters": len(text),
-        "characters_without_spaces": len(re.sub(r"\\s", "", text)),
+        "characters_without_spaces": len(re.sub(r"\s", "", text)),
         "words": word_count,
         "sentences": sentence_count,
         "paragraphs": len(paragraphs),
@@ -60,7 +60,8 @@ def main():
     args = parser.parse_args()
     if args.file:
         try:
-            text = open(args.file, "r", encoding="utf-8").read()
+            with open(args.file, "r", encoding="utf-8") as handle:
+                text = handle.read()
         except OSError as exc:
             parser.error(str(exc))
     else:
